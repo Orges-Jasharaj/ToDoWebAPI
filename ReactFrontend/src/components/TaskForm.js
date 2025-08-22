@@ -5,7 +5,8 @@ const TaskForm = ({ onSubmit, onCancel, task, isEditing }) => {
     title: '',
     description: '',
     dificulty: 1,
-    deadLine: ''
+    deadLine: '',
+    userId: ''
   });
 
   useEffect(() => {
@@ -14,7 +15,8 @@ const TaskForm = ({ onSubmit, onCancel, task, isEditing }) => {
         title: task.title || '',
         description: task.description || '',
         dificulty: task.dificulty || 1,
-        deadLine: task.deadLine ? new Date(task.deadLine).toISOString().split('T')[0] : ''
+        deadLine: task.deadLine ? new Date(task.deadLine).toISOString().split('T')[0] : '',
+        userId: task.userId || ''
       });
     }
   }, [task]);
@@ -30,7 +32,8 @@ const TaskForm = ({ onSubmit, onCancel, task, isEditing }) => {
       title: formData.title,
       description: formData.description,
       dificulty: parseInt(formData.dificulty),
-      deadLine: new Date(formData.deadLine).toISOString()
+      deadLine: new Date(formData.deadLine).toISOString(),
+      userId: formData.userId?.trim() || undefined
     };
 
     if (isEditing) {
@@ -75,6 +78,20 @@ const TaskForm = ({ onSubmit, onCancel, task, isEditing }) => {
         <div className="form-group">
           <label htmlFor="deadLine">Deadline *</label>
           <input type="date" id="deadLine" name="deadLine" className="form-control" value={formData.deadLine} onChange={handleChange} required min={new Date().toISOString().split('T')[0]} />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="userId">Assignee UserId (optional)</label>
+          <input
+            type="text"
+            id="userId"
+            name="userId"
+            className="form-control"
+            placeholder="Identity User Id to assign this task"
+            value={formData.userId}
+            onChange={handleChange}
+          />
+          <small className="text-muted">Nëse lihet bosh, caktohet vetes.</small>
         </div>
 
         <div className="task-actions">

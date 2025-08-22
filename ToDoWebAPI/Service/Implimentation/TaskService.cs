@@ -102,7 +102,7 @@ namespace ToDoWebAPI.Service.Implimentation
             var user = await _context.Users.FindAsync(userId);
             if (user == null)
             {
-                return null;
+                return new List<TaskDto>();
             }
             return await _context.Tasks
                 .Where(t => t.UserId == userId)

@@ -22,8 +22,15 @@ namespace ToDoWebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllTasks()
         {
-            var tasks = await _taskService.GetAllTasksAsync();
-            return Ok(tasks);
+            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+
+            // Only return tasks assigned to the current user
+            var tasks = await _taskService.GetTasksByUserIdAsync(currentUserId);
+            return Ok(tasks ?? new List<TaskDto>());
         }
 
         [HttpGet("{id}")]
@@ -40,16 +47,21 @@ namespace ToDoWebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateTask([FromBody] CreateTaskDto newTask)
         {
-            var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-            if (string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(currentUserId))
                 return Unauthorized("User ID not found in token.");
 
-            newTask.CreatedBy = userId; 
-            newTask.UserId = userId;    
+            // CreatedBy should be the logged-in user
+            newTask.CreatedBy = currentUserId;
+            // UserId is the assignee; if not provided, assign to the creator by default
+            if (string.IsNullOrWhiteSpace(newTask.UserId))
+            {
+                newTask.UserId = currentUserId;
+            }
 
-            var createdTask = await _taskService.CreateTaskAsync(newTask);
-            return Ok(createdTask);
+            var created = await _taskService.CreateTaskAsync(newTask);
+            return Ok(created);
         }
 
 
@@ -57,7 +69,9 @@ namespace ToDoWebAPI.Controllers
 
         public async Task<IActionResult> UpdateTask(string id, [FromBody] CreateTaskDto updatedTask)
         {
-            updatedTask.UserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            updatedTask.UserId = string.IsNullOrWhiteSpace(updatedTask.UserId)
+                ? User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value
+                : updatedTask.UserId;
             return Ok(await _taskService.UpdateTaskAsync(id, updatedTask));
         }
 
