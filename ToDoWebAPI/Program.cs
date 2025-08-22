@@ -30,6 +30,7 @@ namespace ToDoWebAPI
 
             builder.Services.AddScoped<IUser, UserService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<ITaskService, TaskService>();
 
 
 
