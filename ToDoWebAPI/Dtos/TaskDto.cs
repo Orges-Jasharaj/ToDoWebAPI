@@ -34,7 +34,7 @@ namespace ToDoWebAPI.Dtos
         [Required]
         public DateTime DeadLine { get; set; }
         public string? Description { get; set; }
-        public string CreatedBy { get; set; }
-        public string UserId { get; set; }
+        public string? CreatedBy { get; set; }
+        public string? UserId { get; set; }
     }
 }

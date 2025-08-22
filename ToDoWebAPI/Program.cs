@@ -102,8 +102,22 @@ namespace ToDoWebAPI
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddEndpointsApiExplorer();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+
+            // Add CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowReactApp",
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:3000")
+                               .AllowAnyHeader()
+                               .AllowAnyMethod()
+                               .AllowCredentials();
+                    });
+            });
 
             var app = builder.Build();
 
@@ -120,8 +134,12 @@ namespace ToDoWebAPI
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection(); // Disabled: no HTTPS port configured, using HTTP 5001 in dev
 
+            // Use CORS
+            app.UseCors("AllowReactApp");
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
