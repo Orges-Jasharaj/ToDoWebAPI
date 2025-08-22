@@ -13,19 +13,22 @@ namespace ToDoWebAPI.Service.Implimentation
         private readonly IUserEmailStore<User> _emailStore;
         private readonly SignInManager<User> _signInManager;
         private readonly ITokenService _tokenService;
+        private readonly ILogger<UserService> _logger;
 
         public UserService(
             UserManager<User> userManager,
             IUserStore<User> userStore,
             IUserEmailStore<User> emailStore,
             SignInManager<User> signInManager,
-            ITokenService tokenService)
+            ITokenService tokenService,
+            ILogger<UserService> logger)
         {
             _userManager = userManager;
             _userStore = userStore;
             _emailStore = emailStore;
             _signInManager = signInManager;
             _tokenService = tokenService;
+            _logger = logger;
         }
 
 
@@ -33,33 +36,43 @@ namespace ToDoWebAPI.Service.Implimentation
 
         public async Task<ResponseDto<bool>> CreateUserAsync(CreateUserDto createUserDto)
         {
-            var userExisits = await _userManager.FindByEmailAsync(createUserDto.Email);
-            if (userExisits != null)
+            try
             {
-                return ResponseDto<bool>.Failure("User already exists");
+                var userExisits = await _userManager.FindByEmailAsync(createUserDto.Email);
+                if (userExisits != null)
+                {
+                    _logger.LogWarning($"Attempt to create user with existing email {createUserDto.Email}");
+                    return ResponseDto<bool>.Failure("User already exists");
+                }
+                var user = new User
+                {
+                    FirstName = createUserDto.FirstName,
+                    LastName = createUserDto.LastName,
+                    DateOfBirth = createUserDto.DateOfBirth
+                };
+                await _userStore.SetUserNameAsync(user, createUserDto.Email, CancellationToken.None);
+                await _emailStore.SetEmailAsync(user, createUserDto.Email, CancellationToken.None);
+
+                var result = await _userManager.CreateAsync(user, createUserDto.Password);
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation($"User {user.Email} created successfully");
+                    return ResponseDto<bool>.SuccessResponse(true, "User created successfully");
+                }
+                var errors = result.Errors.Select(e => new ApiError
+                {
+                    ErrorCode = e.Code,
+                    ErrorMessage = e.Description
+                }).ToList();
+
+
+                return ResponseDto<bool>.Failure("User creation failed", errors);
             }
-            var user = new User
+            catch (Exception ex)
             {
-                FirstName = createUserDto.FirstName,
-                LastName = createUserDto.LastName,
-                DateOfBirth = createUserDto.DateOfBirth
-            };
-            await _userStore.SetUserNameAsync(user, createUserDto.Email, CancellationToken.None);
-            await _emailStore.SetEmailAsync(user, createUserDto.Email, CancellationToken.None);
-
-            var result = await _userManager.CreateAsync(user, createUserDto.Password);
-            if (result.Succeeded)
-            {
-                return ResponseDto<bool>.SuccessResponse(true, "User created successfully");
+                _logger.LogError(ex, "An error occurred while creating user with email {Email}", createUserDto.Email);
+                return ResponseDto<bool>.Failure("An error occurred while creating user");
             }
-            var errors = result.Errors.Select(e => new ApiError
-            {
-                ErrorCode = e.Code,
-                ErrorMessage = e.Description
-            }).ToList();
-
-
-            return ResponseDto<bool>.Failure("User creation failed", errors);
 
         }
 
@@ -74,6 +87,7 @@ namespace ToDoWebAPI.Service.Implimentation
             var result = await _userManager.DeleteAsync(user);
             if (result.Succeeded)
             {
+                _logger.LogInformation($"User {user.Email} deleted successfully");
                 return ResponseDto<bool>.SuccessResponse(true, "User deleted successfully.");
             }
             var errors = result.Errors.Select(e => new ApiError
@@ -82,6 +96,7 @@ namespace ToDoWebAPI.Service.Implimentation
                 ErrorMessage = e.Description
             }).ToList();
 
+            _logger.LogWarning($"Failed to delete user {user.Email}: {string.Join(", ", errors.Select(err => err.ErrorMessage))}");
             return ResponseDto<bool>.Failure("User deletion failed.", errors);
         }
 
@@ -167,6 +182,7 @@ namespace ToDoWebAPI.Service.Implimentation
 
             if (result.Succeeded)
             {
+                _logger.LogInformation($"User {user.Email} updated successfully");
                 return ResponseDto<bool>.SuccessResponse(true, "User updated successfully.");
             }
 
@@ -176,6 +192,7 @@ namespace ToDoWebAPI.Service.Implimentation
                 ErrorMessage = e.Description
             }).ToList();
 
+            _logger.LogWarning($"Failed to update user {user.Email}: {string.Join(", ", errors.Select(err => err.ErrorMessage))}");
             return ResponseDto<bool>.Failure("User update failed.", errors);
         }
 
@@ -190,6 +207,7 @@ namespace ToDoWebAPI.Service.Implimentation
             var result = await _userManager.ChangePasswordAsync(user, changePasswordDto.OldPassword, changePasswordDto.NewPassword);
             if (result.Succeeded)
             {
+                _logger.LogInformation($"User {user.Email} changed password successfully");
                 return ResponseDto<bool>.SuccessResponse(true, "Password changed successfully");
             }
             var errors = result.Errors.Select(e => new ApiError
@@ -197,6 +215,7 @@ namespace ToDoWebAPI.Service.Implimentation
                 ErrorCode = e.Code,
                 ErrorMessage = e.Description
             }).ToList();
+            _logger.LogWarning($"Failed to change password for user {user.Email}: {string.Join(", ", errors.Select(err => err.ErrorMessage))}");
             return ResponseDto<bool>.Failure("Password change failed", errors);
 
 

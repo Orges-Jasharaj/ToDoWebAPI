@@ -12,10 +12,12 @@ namespace ToDoWebAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUser _userService;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(IUser userService)
+        public UserController(IUser userService, ILogger<UserController> logger)
         {
             _userService = userService;
+            _logger = logger;
         }
 
         [HttpGet("all")]
@@ -57,6 +59,12 @@ namespace ToDoWebAPI.Controllers
 
             var result = await _userService.ChangeUserPassword(changePasswordDto);
             return Ok(result);
+        }
+
+        [HttpGet("logger")]
+        public IActionResult GetLogger()
+        {
+            throw new Exception("This is a test exception for logging purposes");
         }
     }
 }

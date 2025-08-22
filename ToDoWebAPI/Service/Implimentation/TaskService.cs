@@ -9,10 +9,12 @@ namespace ToDoWebAPI.Service.Implimentation
     public class TaskService : ITaskService
     {
         private readonly AppDbContext _context;
+        private readonly ILogger<TaskService> _logger;
 
-        public TaskService(AppDbContext context)
+        public TaskService(AppDbContext context, ILogger<TaskService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
 
@@ -31,6 +33,7 @@ namespace ToDoWebAPI.Service.Implimentation
             };
             _context.Tasks.Add(task);
             await _context.SaveChangesAsync();
+            _logger.LogInformation($"Task created with ID: {task.Id}");
             return true;
         }
 
@@ -43,6 +46,7 @@ namespace ToDoWebAPI.Service.Implimentation
             }
             _context.Tasks.Remove(existingTask);
             await _context.SaveChangesAsync();
+            _logger.LogInformation($"Task deleted with ID: {taskId}");
             return true;
         }
 
@@ -132,6 +136,7 @@ namespace ToDoWebAPI.Service.Implimentation
             task.CompletedAt = DateTime.UtcNow;
             task.CompletedBy = completedBy;
             await _context.SaveChangesAsync();
+            _logger.LogInformation($"Task marked as completed with ID: {taskId}");
             return true;
         }
 
@@ -149,6 +154,7 @@ namespace ToDoWebAPI.Service.Implimentation
             task.UpdatedAt = DateTime.UtcNow;
             task.UpdatedBy = updatedTask.UserId;
             await _context.SaveChangesAsync();
+            _logger.LogInformation($"Task updated with ID: {taskId}");
             return true;    
         }
     }
