@@ -21,8 +21,7 @@ namespace ToDoWebAPI.Controllers
         }
 
         [HttpGet("all")]
-        //[Authorize(Roles = "Admin")] 
-        [Authorize]
+        [Authorize(Roles = "Admin")] 
         public async Task<IActionResult> GetAllUsers()
         {
             var result = await _userService.GetAllUsersAsync();

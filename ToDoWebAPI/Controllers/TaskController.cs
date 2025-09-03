@@ -66,7 +66,7 @@ namespace ToDoWebAPI.Controllers
 
 
         [HttpPut("{id}")]
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateTask(string id, [FromBody] CreateTaskDto updatedTask)
         {
             updatedTask.UserId = string.IsNullOrWhiteSpace(updatedTask.UserId)
