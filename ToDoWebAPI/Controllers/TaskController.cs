@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using ToDoWebAPI.Data.Models;
 using ToDoWebAPI.Dtos.Responses;
 using ToDoWebAPI.Service.Interface;
 
@@ -44,6 +45,7 @@ namespace ToDoWebAPI.Controllers
 
 
         [HttpGet("getmytask")]
+        [Authorize]
         public async Task<IActionResult> GetMyTasks()
         {
             var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -58,6 +60,7 @@ namespace ToDoWebAPI.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = $"{RoleTypes.Admin},{RoleTypes.SuperAdmin}")]
         public async Task<IActionResult> CreateTask([FromBody] CreateTaskDto newTask)
         {
             var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -77,7 +80,7 @@ namespace ToDoWebAPI.Controllers
 
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = $"{RoleTypes.Admin},{RoleTypes.SuperAdmin}")]
         public async Task<IActionResult> UpdateTask(string id, [FromBody] CreateTaskDto updatedTask)
         {
             updatedTask.UserId = string.IsNullOrWhiteSpace(updatedTask.UserId)
@@ -87,6 +90,7 @@ namespace ToDoWebAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = $"{RoleTypes.Admin},{RoleTypes.SuperAdmin}")]
         public async Task<IActionResult> DeleteTask(string id)
         {
             var result = await _taskService.DeleteTaskAsync(id);
@@ -98,7 +102,7 @@ namespace ToDoWebAPI.Controllers
         }
 
         [HttpPost("{id}/complete")]
-
+        [Authorize(Roles = $"{RoleTypes.Admin},{RoleTypes.SuperAdmin},{RoleTypes.Employee}")]
         public async Task<IActionResult> MarkTaskAsCompleted(string id, [FromBody] string completedBy)
         {
             return Ok(await _taskService.MarkTaskAsCompletedAsync(id, completedBy));

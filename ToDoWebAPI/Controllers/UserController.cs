@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using ToDoWebAPI.Data.Models;
 using ToDoWebAPI.Dtos.Requests;
 using ToDoWebAPI.Dtos.Responses;
 using ToDoWebAPI.Service.Interface;
@@ -22,7 +23,7 @@ namespace ToDoWebAPI.Controllers
         }
 
         [HttpGet("all")]
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = $"{RoleTypes.Admin},{RoleTypes.SuperAdmin}")]
         public async Task<IActionResult> GetAllUsers()
         {
             var result = await _userService.GetAllUsersAsync();
@@ -30,6 +31,7 @@ namespace ToDoWebAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = $"{RoleTypes.Admin},{RoleTypes.SuperAdmin}")]
         public async Task<IActionResult> GetUserById(string id)
         {
             var result = await _userService.GetUserByIdAsync(int.Parse(id));
@@ -37,6 +39,7 @@ namespace ToDoWebAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = $"{RoleTypes.Admin},{RoleTypes.SuperAdmin}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDto updateUserDto)
         {
             var result = await _userService.UpdateUserAsync(id, updateUserDto);
@@ -44,7 +47,8 @@ namespace ToDoWebAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = $"{RoleTypes.Admin},{RoleTypes.SuperAdmin}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
             var result = await _userService.DeleteUserAsync(id);
@@ -52,6 +56,7 @@ namespace ToDoWebAPI.Controllers
         }
 
         [HttpPost("changepassword")]
+        [Authorize(Roles = $"{RoleTypes.Employee}")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -61,10 +66,10 @@ namespace ToDoWebAPI.Controllers
             return Ok(result);
         }
 
-        [HttpGet("logger")]
-        public IActionResult GetLogger()
-        {
-            throw new Exception("This is a test exception for logging purposes");
-        }
+        //[HttpGet("logger")]
+        //public IActionResult GetLogger()
+        //{
+        //    throw new Exception("This is a test exception for logging purposes");
+        //}
     }
 }
