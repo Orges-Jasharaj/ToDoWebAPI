@@ -4,9 +4,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using ToDoWebAPI.Data.Models;
-using ToDoWebAPI.Dtos;
+using ToDoWebAPI.Dtos.System;
 using ToDoWebAPI.Service.Interface;
-using static ToDoWebAPI.Dtos.TokenDtos;
+using static ToDoWebAPI.Dtos.System.TokenDtos;
 
 namespace ToDoWebAPI.Service.Implimentation
 {

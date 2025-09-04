@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ToDoWebAPI.Data.Models;
 
-namespace ToDoWebAPI.Dtos
+namespace ToDoWebAPI.Dtos.Responses
 {
     public class TaskDto
     {

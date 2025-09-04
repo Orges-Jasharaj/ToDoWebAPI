@@ -1,4 +1,4 @@
-﻿namespace ToDoWebAPI.Dtos
+﻿namespace ToDoWebAPI.Dtos.Responses
 {
     public class ResponseDto<T>
     {

@@ -1,5 +1,5 @@
 ﻿using ToDoWebAPI.Data.Models;
-using ToDoWebAPI.Dtos;
+using ToDoWebAPI.Dtos.Responses;
 
 namespace ToDoWebAPI.Service.Interface
 {

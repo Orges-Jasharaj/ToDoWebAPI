@@ -1,4 +1,4 @@
-﻿namespace ToDoWebAPI.Dtos
+﻿namespace ToDoWebAPI.Dtos.System
 {
     public class TokenDtos
     {

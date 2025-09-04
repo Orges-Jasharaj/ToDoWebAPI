@@ -1,11 +1,13 @@
-﻿using ToDoWebAPI.Dtos;
-using static ToDoWebAPI.Dtos.TokenDtos;
+﻿using ToDoWebAPI.Dtos.Requests;
+using ToDoWebAPI.Dtos.Responses;
+using static ToDoWebAPI.Dtos.System.TokenDtos;
 
 namespace ToDoWebAPI.Service.Interface
 {
     public interface IUser
     {
         Task<ResponseDto<bool>> CreateUserAsync(CreateUserDto createUserDto);
+        Task<ResponseDto<bool>> CreateUserWithRoleAsync(CreateUserDto createUserDto, string role);
         Task<ResponseDto<LoginResponseDto>> LoginAsync(LoginDto loginDto);
         Task<ResponseDto<UserDto>> GetUserByIdAsync(int userId);
         Task<ResponseDto<List<UserDto>>> GetAllUsersAsync();

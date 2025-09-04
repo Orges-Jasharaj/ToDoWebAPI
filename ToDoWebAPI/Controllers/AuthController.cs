@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ToDoWebAPI.Dtos;
+using ToDoWebAPI.Dtos.Requests;
+using ToDoWebAPI.Dtos.Responses;
+using ToDoWebAPI.Dtos.System;
 using ToDoWebAPI.Service.Interface;
 
 namespace ToDoWebAPI.Controllers

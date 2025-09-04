@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ToDoWebAPI.Data;
 using ToDoWebAPI.Data.Models;
-using ToDoWebAPI.Dtos;
+using ToDoWebAPI.Dtos.Responses;
 using ToDoWebAPI.Service.Interface;
 
 namespace ToDoWebAPI.Service.Implimentation

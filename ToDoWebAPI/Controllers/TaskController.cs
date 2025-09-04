@@ -2,14 +2,13 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using ToDoWebAPI.Dtos;
+using ToDoWebAPI.Dtos.Responses;
 using ToDoWebAPI.Service.Interface;
 
 namespace ToDoWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class TaskController : ControllerBase
     {
         private readonly ITaskService _taskService;
@@ -28,7 +27,6 @@ namespace ToDoWebAPI.Controllers
                 return Unauthorized("User ID not found in token.");
             }
 
-            // Only return tasks assigned to the current user
             var tasks = await _taskService.GetTasksByUserIdAsync(currentUserId);
             return Ok(tasks ?? new List<TaskDto>());
         }
@@ -52,9 +50,7 @@ namespace ToDoWebAPI.Controllers
             if (string.IsNullOrEmpty(currentUserId))
                 return Unauthorized("User ID not found in token.");
 
-            // CreatedBy should be the logged-in user
             newTask.CreatedBy = currentUserId;
-            // UserId is the assignee; if not provided, assign to the creator by default
             if (string.IsNullOrWhiteSpace(newTask.UserId))
             {
                 newTask.UserId = currentUserId;

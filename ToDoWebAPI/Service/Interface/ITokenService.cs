@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 using ToDoWebAPI.Data.Models;
-using static ToDoWebAPI.Dtos.TokenDtos;
+using static ToDoWebAPI.Dtos.System.TokenDtos;
 
 namespace ToDoWebAPI.Service.Interface
 {
