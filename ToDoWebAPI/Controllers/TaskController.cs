@@ -42,6 +42,21 @@ namespace ToDoWebAPI.Controllers
             return Ok(task);
         }
 
+
+        [HttpGet("getmytask")]
+        public async Task<IActionResult> GetMyTasks()
+        {
+            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+            var tasks = await _taskService.GetTasksByUserIdAsync(currentUserId);
+            return Ok(tasks ?? new List<TaskDto>());
+        }
+
+
+
         [HttpPost]
         public async Task<IActionResult> CreateTask([FromBody] CreateTaskDto newTask)
         {

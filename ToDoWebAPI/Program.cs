@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using ToDoWebAPI.Data;
 using ToDoWebAPI.Data.Models;
+using ToDoWebAPI.Dtos.Seed;
 using ToDoWebAPI.Dtos.System;
 using ToDoWebAPI.Service.Implimentation;
 using ToDoWebAPI.Service.Interface;
@@ -120,6 +121,8 @@ namespace ToDoWebAPI
             });
 
             var app = builder.Build();
+
+            SeedData.InitializeAsync(app.Services).GetAwaiter().GetResult();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
