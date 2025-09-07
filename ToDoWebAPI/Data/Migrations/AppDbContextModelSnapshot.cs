@@ -203,7 +203,7 @@ namespace ToDoWebAPI.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Tasks");
+                    b.ToTable("Tasks", (string)null);
                 });
 
             modelBuilder.Entity("ToDoWebAPI.Data.Models.User", b =>
